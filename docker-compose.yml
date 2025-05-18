@@ -1,0 +1,53 @@
+# This configuration is for development purposes only, not for production use.
+
+x-common-mongodb-environment: &common-mongodb-environment
+    MONGODB_HOST: mongodb
+    MONGODB_PORT: 27017
+
+services:
+    mongodb:
+        image: mongo
+        ports:
+            - 27017:27017
+        healthcheck:
+            test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 20s
+
+    consumer:
+        build:
+            dockerfile: ./cmd/consumer/Dockerfile
+        environment:
+            <<: *common-mongodb-environment
+            POST_MAX_DATE: 720h # Save only posts created in the last month
+            POST_COLLECTION_CUTOFF_CRON_DELAY: 30m # 30 minutes
+            POST_COLLECTION_CUTOFF_CRON_MAX_DOCUMENT: 10000000 # Delete post documents after 10 million
+        depends_on:
+            mongodb:
+                condition: service_healthy
+
+    feedgen_az:
+        build:
+            dockerfile: ./cmd/feedgen/az/Dockerfile
+        environment:
+            <<: *common-mongodb-environment
+            FEED_AZ_GENERATER_CRON_DELAY: 1m # 1 minute
+            FEED_AZ_COLLECTION_CUTOFF_CRON_DELAY: 30m # 30 minutes
+            FEED_AZ_COLLECTION_CUTOFF_CRON_MAX_DOCUMENT: 500000 # Delete post documents after 500 thousand
+        depends_on:
+            mongodb:
+                condition: service_healthy
+
+    api:
+        build:
+            dockerfile: ./cmd/api/Dockerfile
+        ports:
+            - 8421:8421
+        environment:
+            <<: *common-mongodb-environment
+            API_PORT: 8421
+        depends_on:
+            mongodb:
+                condition: service_healthy

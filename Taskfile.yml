@@ -1,0 +1,78 @@
+# https://taskfile.dev
+
+version: "3"
+
+tasks:
+    ftl:
+        cmds:
+            - task: fmt
+            - task: tidy
+            - task: lint
+
+    fmt: gofmt -w -d .
+
+    tidy: go mod tidy
+
+    lint: golangci-lint run
+
+    run-consumer:
+        cmd: go run cmd/consumer/main.go {{.CLI_ARGS}}
+        dotenv:
+            - config/app/.consumer.env
+            - config/app/.mongodb.env
+
+    run-feedgen-az:
+        cmd: go run cmd/feedgen/az/main.go {{.CLI_ARGS}}
+        dotenv:
+            - config/app/feedgen/.az.env
+            - config/app/.mongodb.env
+
+    run-api:
+        cmd: go run cmd/api/main.go
+        dotenv:
+            - config/app/.api.env
+            - config/app/.mongodb.env
+
+    run-manager:
+        cmd: go run cmd/manager/main.go {{.CLI_ARGS}}
+
+    generate-env:
+        desc: Generate env files from templates
+        cmds:
+            - cp config/app/consumer.env.example config/app/.consumer.env
+            - cp config/app/api.env.example config/app/.api.env
+            - cp config/app/mongodb.env.example config/app/.mongodb.env
+            - cp config/app/feedgen/az.env.example config/app/feedgen/.az.env
+            - cp config/mongodb/env.example config/mongodb/.env
+
+    docker-publish-all:
+        desc: Publish docker images for all services
+        cmds:
+            - task: docker-publish-api
+            - task: docker-publish-consumer
+            - task: docker-publish-feedgen-az
+            - task: docker-publish-manager
+
+    docker-publish-api:
+        desc: Publish docker image for api service
+        cmds:
+            - docker build -t git.aykhans.me/bsky/feedgen-api:latest -f ./cmd/api/Dockerfile .
+            - docker push git.aykhans.me/bsky/feedgen-api:latest
+
+    docker-publish-consumer:
+        desc: Publish docker image for consumer service
+        cmds:
+            - docker build -t git.aykhans.me/bsky/feedgen-consumer:latest -f ./cmd/consumer/Dockerfile .
+            - docker push git.aykhans.me/bsky/feedgen-consumer:latest
+
+    docker-publish-feedgen-az:
+        desc: Publish docker image for feedgen-az service
+        cmds:
+            - docker build -t git.aykhans.me/bsky/feedgen-generator-az:latest -f ./cmd/feedgen/az/Dockerfile .
+            - docker push git.aykhans.me/bsky/feedgen-generator-az:latest
+
+    docker-publish-manager:
+        desc: Publish docker image for manager service
+        cmds:
+            - docker build -t git.aykhans.me/bsky/feedgen-manager:latest -f ./cmd/manager/Dockerfile .
+            - docker push git.aykhans.me/bsky/feedgen-manager:latest

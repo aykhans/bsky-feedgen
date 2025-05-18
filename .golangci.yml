@@ -1,0 +1,33 @@
+version: "2"
+
+run:
+    go: "1.24"
+    concurrency: 8
+    timeout: 10m
+
+linters:
+    default: none
+    enable:
+        - asasalint
+        - asciicheck
+        - errcheck
+        - gomodguard
+        - goprintffuncname
+        - govet
+        - ineffassign
+        - misspell
+        - nakedret
+        - nolintlint
+        - prealloc
+        - reassign
+        - staticcheck
+        - unconvert
+        - unused
+        - whitespace
+
+    settings:
+        staticcheck:
+            checks:
+                - "all"
+                - "-S1002"
+                - "-ST1000"
