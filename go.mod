@@ -8,6 +8,8 @@ require (
 	go.mongodb.org/mongo-driver v1.17.3
 )
 
+require go.uber.org/automaxprocs v1.6.0 // indirect
+
 require (
 	github.com/RussellLuo/slidingwindow v0.0.0-20200528002341-535bb99d338b // indirect
 	github.com/beorn7/perks v1.0.1 // indirect
