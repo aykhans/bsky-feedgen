@@ -16,6 +16,11 @@ import (
 var azValidUsers []string = []string{
 	"did:plc:jbt4qi6psd7rutwzedtecsq7",
 	"did:plc:yzgdpxsklrmfgqmjghdvw3ti",
+	"did:plc:g7ebgiai577ln3avsi2pt3sn",
+	"did:plc:3tk4xtdhxpqsyuimv2lrphb",
+	"did:plc:phtq2rhgbwipyx5ie3apw44j",
+	"did:plc:jfdvklrs5n5qv7f25v6swc5h",
+	"did:plc:u5ez5w6qslh6advti4wyddba",
 	"did:plc:cs2cbzojm6hmx5lfxiuft3mq",
 }
 

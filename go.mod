@@ -6,9 +6,8 @@ require (
 	github.com/bluesky-social/indigo v0.0.0-20250516010818-f8de501bd6a0
 	github.com/gorilla/websocket v1.5.1
 	go.mongodb.org/mongo-driver v1.17.3
+	go.uber.org/automaxprocs v1.6.0
 )
-
-require go.uber.org/automaxprocs v1.6.0 // indirect
 
 require (
 	github.com/RussellLuo/slidingwindow v0.0.0-20200528002341-535bb99d338b // indirect
