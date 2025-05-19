@@ -12,6 +12,7 @@ import (
 	"github.com/aykhans/bsky-feedgen/pkg/logger"
 	"github.com/aykhans/bsky-feedgen/pkg/storage/mongodb"
 	"github.com/aykhans/bsky-feedgen/pkg/storage/mongodb/collections"
+	_ "go.uber.org/automaxprocs"
 )
 
 func main() {
