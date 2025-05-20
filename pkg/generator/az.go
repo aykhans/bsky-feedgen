@@ -15,6 +15,7 @@ import (
 
 var azInvalidUser []string = []string{
 	"did:plc:5zww7zorx2ajw7hqrhuix3ba",
+	"did:plc:c4vhz47h566t2ntgd7gtawen",
 }
 
 var azValidUsers []string = []string{
