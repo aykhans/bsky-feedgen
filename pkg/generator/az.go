@@ -13,6 +13,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+var azInvalidUser []string = []string{
+	"did:plc:5zww7zorx2ajw7hqrhuix3ba",
+}
+
 var azValidUsers []string = []string{
 	"did:plc:jbt4qi6psd7rutwzedtecsq7",
 	"did:plc:yzgdpxsklrmfgqmjghdvw3ti",
@@ -121,6 +125,10 @@ func (generator *FeedGeneratorAz) Start(ctx context.Context, cursorOption types.
 
 func (generator *FeedGeneratorAz) IsValid(post *collections.Post) bool {
 	if post.Reply != nil && post.Reply.RootURI != post.Reply.ParentURI {
+		return false
+	}
+
+	if slices.Contains(azInvalidUser, post.DID) {
 		return false
 	}
 
