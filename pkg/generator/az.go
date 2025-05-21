@@ -17,6 +17,7 @@ var azInvalidUsers []string = []string{
 	"did:plc:5zww7zorx2ajw7hqrhuix3ba",
 	"did:plc:c4vhz47h566t2ntgd7gtawen",
 	"did:plc:lc7j7xdq67gn7vc6vzmydfqk",
+	"did:plc:msian4dqa2rqalf3biilnf3m",
 }
 
 var azValidUsers []string = []string{
