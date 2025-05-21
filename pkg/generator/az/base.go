@@ -114,16 +114,14 @@ func (generator *Generator) IsValid(post *collections.Post) bool {
 		return false
 	}
 
-	if slices.Contains(invalidUsers, post.DID) {
-		return false
+	if isValidUser := users.IsValid(post.DID); isValidUser != nil {
+		return *isValidUser
 	}
 
-	if slices.Contains(validUsers, post.DID) || // Posts from always-valid users
-		(slices.Contains(post.Langs, "az") && len(post.Langs) < 3) || // Posts in Azerbaijani language with fewer than 3 languages
+	if (slices.Contains(post.Langs, "az") && len(post.Langs) < 3) || // Posts in Azerbaijani language with fewer than 3 languages
 		generator.textRegex.MatchString(post.Text) { // Posts containing Azerbaijan-related keywords
 		return true
 	}
 
 	return false
 }
-
