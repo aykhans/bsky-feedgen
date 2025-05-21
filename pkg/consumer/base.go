@@ -272,7 +272,7 @@ func ConsumeAndSaveToMongoDB(
 				postBatch = []*collections.Post{} // Clear batch after insert
 			} else {
 				// If we haven't seen any data for 25 seconds, cancel the consumer connection
-				if consumerLastFlushingTime.Add(time.Second*25).Before(time.Now()) {
+				if consumerLastFlushingTime.Add(time.Second * 25).Before(time.Now()) {
 					cancel()
 				}
 			}
