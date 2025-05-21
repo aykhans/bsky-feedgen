@@ -1,0 +1,74 @@
+x-common-mongodb-environment: &common-mongodb-environment
+    MONGODB_HOST: mongodb
+    MONGODB_PORT: 27017
+    MONGODB_USERNAME: aykhan
+    MONGODB_PASSWORD: ch7278832gf99010hgbddewd2y28982v3dvbv28vv2dv2d2gbvby2
+
+services:
+    mongodb:
+        image: mongo
+        restart: unless-stopped
+        ports:
+            - 27017:27017
+        volumes:
+            - mongodb_data:/data/db
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: aykhan
+            MONGO_INITDB_ROOT_PASSWORD: ch7278832gf99010hgbddewd2y28982v3dvbv28vv2dv2d2gbvby2
+        healthcheck:
+            test: echo 'db.runCommand("ping").ok' | mongosh --quiet
+            interval: 10s
+            timeout: 5s
+            retries: 5
+            start_period: 20s
+
+    consumer:
+        image: git.aykhans.me/bsky/feedgen-consumer:latest
+        restart: unless-stopped
+        environment:
+            <<: *common-mongodb-environment
+            POST_MAX_DATE: 720h # Save only posts created in the last month
+            POST_COLLECTION_CUTOFF_CRON_DELAY: 10m # 10 minutes
+            POST_COLLECTION_CUTOFF_CRON_MAX_DOCUMENT: 2900000 # Delete post documents after 4 million
+        depends_on:
+            mongodb:
+                condition: service_healthy
+
+    feedgen_az:
+        image: git.aykhans.me/bsky/feedgen-generator-az:latest
+        restart: unless-stopped
+        environment:
+            <<: *common-mongodb-environment
+            FEED_AZ_GENERATER_CRON_DELAY: 1m # 1 minute
+            FEED_AZ_COLLECTION_CUTOFF_CRON_DELAY: 30m # 30 minutes
+            FEED_AZ_COLLECTION_CUTOFF_CRON_MAX_DOCUMENT: 10000
+        depends_on:
+            mongodb:
+                condition: service_healthy
+
+    api:
+        image: git.aykhans.me/bsky/feedgen-api:latest
+        restart: unless-stopped
+        ports:
+            - 8421:8421
+        environment:
+            <<: *common-mongodb-environment
+            FEEDGEN_HOSTNAME: https://feeds.bsky.aykhans.me
+            FEEDGEN_PUBLISHER_DID: did:plc:cs2cbzojm6hmx5lfxiuft3mq
+            API_PORT: 8421
+        depends_on:
+            mongodb:
+                condition: service_healthy
+
+    caddy:
+        image: caddy:2.10.0-alpine
+        restart: unless-stopped
+        ports:
+            - 80:80
+            - 443:443
+            - 443:443/udp
+        volumes:
+            - ./Caddyfile:/etc/caddy/Caddyfile
+
+volumes:
+    mongodb_data:

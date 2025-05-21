@@ -264,7 +264,7 @@ func ConsumeAndSaveToMongoDB(
 		case <-ticker.C:
 			if len(postBatch) > 0 {
 				consumerLastFlushingTime = time.Now()
-				logger.Log.Info("flushing post batch", "count", len(postBatch))
+				// logger.Log.Info("flushing post batch", "count", len(postBatch))
 				err := postCollection.Insert(ctx, true, postBatch...)
 				if err != nil {
 					return fmt.Errorf("mongodb post insert error: %v", err)
