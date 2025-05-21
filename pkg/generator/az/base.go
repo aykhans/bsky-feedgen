@@ -1,4 +1,4 @@
-package generator
+package az
 
 import (
 	"context"
@@ -13,42 +13,24 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var azInvalidUsers []string = []string{
-	"did:plc:5zww7zorx2ajw7hqrhuix3ba",
-	"did:plc:c4vhz47h566t2ntgd7gtawen",
-	"did:plc:lc7j7xdq67gn7vc6vzmydfqk",
-	"did:plc:msian4dqa2rqalf3biilnf3m",
-	"did:plc:gtosalycg7snvodjhsze35jm",
-}
-
-var azValidUsers []string = []string{
-	"did:plc:jbt4qi6psd7rutwzedtecsq7",
-	"did:plc:yzgdpxsklrmfgqmjghdvw3ti",
-	"did:plc:g7ebgiai577ln3avsi2pt3sn",
-	"did:plc:phtq2rhgbwipyx5ie3apw44j",
-	"did:plc:jfdvklrs5n5qv7f25v6swc5h",
-	"did:plc:u5ez5w6qslh6advti4wyddba",
-	"did:plc:cs2cbzojm6hmx5lfxiuft3mq",
-}
-
-type FeedGeneratorAz struct {
+type Generator struct {
 	postCollection   *collections.PostCollection
 	feedAzCollection *collections.FeedAzCollection
 	textRegex        *regexp.Regexp
 }
 
-func NewFeedGeneratorAz(
+func NewGenerator(
 	postCollection *collections.PostCollection,
 	feedAzCollection *collections.FeedAzCollection,
-) *FeedGeneratorAz {
-	return &FeedGeneratorAz{
+) *Generator {
+	return &Generator{
 		postCollection:   postCollection,
 		feedAzCollection: feedAzCollection,
 		textRegex:        regexp.MustCompile("(?i)(azerbaijan|azərbaycan|aзербайджан|azerbaycan)"),
 	}
 }
 
-func (generator *FeedGeneratorAz) Start(ctx context.Context, cursorOption types.GeneratorCursor, batchSize int) error {
+func (generator *Generator) Start(ctx context.Context, cursorOption types.GeneratorCursor, batchSize int) error {
 	var mongoCursor *mongo.Cursor
 	switch cursorOption {
 	case types.GeneratorCursorLastGenerated:
@@ -127,16 +109,16 @@ func (generator *FeedGeneratorAz) Start(ctx context.Context, cursorOption types.
 	return nil
 }
 
-func (generator *FeedGeneratorAz) IsValid(post *collections.Post) bool {
+func (generator *Generator) IsValid(post *collections.Post) bool {
 	if post.Reply != nil && post.Reply.RootURI != post.Reply.ParentURI {
 		return false
 	}
 
-	if slices.Contains(azInvalidUsers, post.DID) {
+	if slices.Contains(invalidUsers, post.DID) {
 		return false
 	}
 
-	if slices.Contains(azValidUsers, post.DID) || // Posts from always-valid users
+	if slices.Contains(validUsers, post.DID) || // Posts from always-valid users
 		(slices.Contains(post.Langs, "az") && len(post.Langs) < 3) || // Posts in Azerbaijani language with fewer than 3 languages
 		generator.textRegex.MatchString(post.Text) { // Posts containing Azerbaijan-related keywords
 		return true
@@ -144,3 +126,4 @@ func (generator *FeedGeneratorAz) IsValid(post *collections.Post) bool {
 
 	return false
 }
+

@@ -10,7 +10,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/aykhans/bsky-feedgen/pkg/generator"
+	feedgenAz "github.com/aykhans/bsky-feedgen/pkg/generator/az"
 	"github.com/aykhans/bsky-feedgen/pkg/types"
 
 	"github.com/aykhans/bsky-feedgen/pkg/config"
@@ -87,7 +87,7 @@ Flags:
 		os.Exit(1)
 	}
 
-	feedGeneratorAz := generator.NewFeedGeneratorAz(postCollection, feedAzCollection)
+	feedGeneratorAz := feedgenAz.NewGenerator(postCollection, feedAzCollection)
 
 	startCrons(ctx, feedGenAzConfig, feedGeneratorAz, feedAzCollection, cursorOption)
 	logger.Log.Info("Cron jobs started")
@@ -98,7 +98,7 @@ Flags:
 func startCrons(
 	ctx context.Context,
 	feedGenAzConfig *config.FeedGenAzConfig,
-	feedGeneratorAz *generator.FeedGeneratorAz,
+	feedGeneratorAz *feedgenAz.Generator,
 	feedAzCollection *collections.FeedAzCollection,
 	cursorOption types.GeneratorCursor,
 ) {
