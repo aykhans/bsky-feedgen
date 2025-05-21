@@ -13,7 +13,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var azInvalidUser []string = []string{
+var azInvalidUsers []string = []string{
 	"did:plc:5zww7zorx2ajw7hqrhuix3ba",
 	"did:plc:c4vhz47h566t2ntgd7gtawen",
 	"did:plc:lc7j7xdq67gn7vc6vzmydfqk",
@@ -130,7 +130,7 @@ func (generator *FeedGeneratorAz) IsValid(post *collections.Post) bool {
 		return false
 	}
 
-	if slices.Contains(azInvalidUser, post.DID) {
+	if slices.Contains(azInvalidUsers, post.DID) {
 		return false
 	}
 
