@@ -50,7 +50,7 @@ func (handler *FeedHandler) DescribeFeeds(w http.ResponseWriter, r *http.Request
 }
 
 func (handler *FeedHandler) GetFeedSkeleton(w http.ResponseWriter, r *http.Request) {
-	userDID, _ := r.Context().Value(middleware.UserDIDKey).(string)
+	userDID, _ := middleware.GetValue[string](r, middleware.UserDIDKey)
 
 	feedQuery := r.URL.Query().Get("feed")
 	if feedQuery == "" {

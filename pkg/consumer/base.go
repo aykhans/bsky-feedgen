@@ -1,5 +1,9 @@
 package consumer
 
+// This file contains code for consuming and processing the Bluesky firehose event stream.
+// Most of this implementation is copied and inspired from the original source at:
+// https://github.com/bluesky-social/indigo/blob/main/cmd/beemo/firehose_consumer.go
+
 import (
 	"bytes"
 	"context"
