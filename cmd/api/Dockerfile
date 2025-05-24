@@ -6,7 +6,7 @@ COPY go.mod go.sum ./
 COPY ../../pkg ./pkg
 COPY ../../cmd/api ./cmd/api
 
-RUN CGO_ENABLED=0 go build -ldflags "-s -w" -o api ./cmd/api/main.go
+RUN CGO_ENABLED=0 go build -ldflags "-s -w" -o api ./cmd/api
 
 FROM gcr.io/distroless/static-debian12:latest
 

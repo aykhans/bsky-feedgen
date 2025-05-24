@@ -5,7 +5,6 @@ package middleware
 import (
 	"crypto"
 	"errors"
-	"fmt"
 
 	atcrypto "github.com/bluesky-social/indigo/atproto/crypto"
 	"github.com/golang-jwt/jwt/v5"
@@ -44,7 +43,6 @@ func init() {
 	jwt.RegisterSigningMethod(SigningMethodES256.Alg(), func() jwt.SigningMethod {
 		return SigningMethodES256
 	})
-	fmt.Println("init Completed")
 }
 
 // Errors returned on different problems.
