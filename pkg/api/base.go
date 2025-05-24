@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/aykhans/bsky-feedgen/pkg/api/handler"
+	"github.com/aykhans/bsky-feedgen/pkg/api/middleware"
 	"github.com/aykhans/bsky-feedgen/pkg/config"
 	"github.com/aykhans/bsky-feedgen/pkg/feed"
 	"github.com/aykhans/bsky-feedgen/pkg/logger"
@@ -23,13 +24,15 @@ func Run(
 	}
 	feedHandler := handler.NewFeedHandler(feeds, apiConfig.FeedgenPublisherDID)
 
+	authMiddleware := middleware.NewAuth(apiConfig.ServiceDID)
+
 	mux := http.NewServeMux()
 
 	mux.HandleFunc("GET /.well-known/did.json", baseHandler.GetWellKnownDIDDoc)
 	mux.HandleFunc("GET /xrpc/app.bsky.feed.describeFeedGenerator", feedHandler.DescribeFeeds)
-	mux.HandleFunc(
+	mux.Handle(
 		"GET /xrpc/app.bsky.feed.getFeedSkeleton",
-		feedHandler.GetFeedSkeleton,
+		authMiddleware.JWTAuthMiddleware(http.HandlerFunc(feedHandler.GetFeedSkeleton)),
 	)
 
 	httpServer := &http.Server{
