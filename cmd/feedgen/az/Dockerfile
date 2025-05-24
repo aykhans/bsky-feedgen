@@ -6,7 +6,7 @@ COPY go.mod go.sum ./
 COPY ../../pkg ./pkg
 COPY ../../cmd/feedgen/az ./cmd/feedgen/az
 
-RUN CGO_ENABLED=0 go build -ldflags "-s -w" -o feedgen ./cmd/feedgen/az/main.go
+RUN CGO_ENABLED=0 go build -ldflags "-s -w" -o feedgen ./cmd/feedgen/az
 
 FROM gcr.io/distroless/static-debian12:latest
 

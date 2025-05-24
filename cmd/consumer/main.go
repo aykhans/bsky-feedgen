@@ -20,42 +20,24 @@ import (
 	_ "go.uber.org/automaxprocs"
 )
 
+type flags struct {
+	version      bool
+	cursorOption types.ConsumerCursor
+}
+
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	go listenForTermination(func() { cancel() })
 
-	flag.Usage = func() {
-		fmt.Println(
-			`Usage:
-
-consumer [flags]
-
-Flags:
-    -h, -help        Display this help message
-    -cursor string   Specify the starting point for data consumption (default: last-consumed)
-        Options:
-       	    last-consumed: Resume from the last processed data in storage
-       	    first-stream: Start from the beginning of the firehose
-       	    current-stream: Start from the current position in the firehose stream`)
+	flags := getFlags()
+	if flags.version == true {
+		fmt.Printf("Consumer version: %v\n", version)
+		os.Exit(0)
 	}
 
-	var cursorOption types.ConsumerCursor
-	flag.Var(&cursorOption, "cursor", "")
-	flag.Parse()
-
-	if args := flag.Args(); len(args) > 0 {
-		if len(args) == 1 {
-			fmt.Printf("unexpected argument: %s\n\n", args[0])
-		} else {
-			fmt.Printf("unexpected arguments: %v\n\n", strings.Join(args, ", "))
-		}
-		flag.CommandLine.Usage()
-		os.Exit(1)
-	}
-
-	if cursorOption == "" {
-		_ = cursorOption.Set("")
+	if flags.cursorOption == "" {
+		_ = flags.cursorOption.Set("")
 	}
 
 	consumerConfig, errMap := config.NewConsumerConfig()
@@ -89,7 +71,7 @@ Flags:
 		ctx,
 		postCollection,
 		"wss://bsky.network",
-		cursorOption,
+		flags.cursorOption,
 		consumerConfig.PostMaxDate, // Save only posts created before PostMaxDate
 		10*time.Second,             // Save consumed data to MongoDB every 10 seconds
 	)
@@ -120,4 +102,40 @@ func listenForTermination(do func()) {
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	<-sigChan
 	do()
+}
+
+func getFlags() *flags {
+	flags := &flags{}
+
+	flag.Usage = func() {
+		fmt.Println(
+			`Usage:
+
+consumer [flags]
+
+Flags:
+    -version         version information
+    -h, -help        Display this help message
+    -cursor string   Specify the starting point for data consumption (default: last-consumed)
+        Options:
+       	    last-consumed: Resume from the last processed data in storage
+       	    first-stream: Start from the beginning of the firehose
+       	    current-stream: Start from the current position in the firehose stream`)
+	}
+
+	flag.BoolVar(&flags.version, "version", false, "print version information")
+	flag.Var(&flags.cursorOption, "cursor", "Specify the starting point for data consumption")
+	flag.Parse()
+
+	if args := flag.Args(); len(args) > 0 {
+		if len(args) == 1 {
+			fmt.Printf("unexpected argument: %s\n\n", args[0])
+		} else {
+			fmt.Printf("unexpected arguments: %v\n\n", strings.Join(args, ", "))
+		}
+		flag.CommandLine.Usage()
+		os.Exit(1)
+	}
+
+	return flags
 }

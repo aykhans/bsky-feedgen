@@ -20,41 +20,24 @@ import (
 	_ "go.uber.org/automaxprocs"
 )
 
+type flags struct {
+	version      bool
+	cursorOption types.GeneratorCursor
+}
+
 func main() {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	go listenForTermination(func() { cancel() })
 
-	flag.Usage = func() {
-		fmt.Println(
-			`Usage:
-
-feedgen-az [flags]
-
-Flags:
-    -h, -help        Display this help message
-    -cursor string   Specify the starting point for feed data generation (default: last-generated)
-        Options:
-       	    last-generated: Resume from the last generated data in storage
-       	    first-post: Start from the beginning of the posts`)
+	flags := getFlags()
+	if flags.version == true {
+		fmt.Printf("Feedgen Az version: %v\n", version)
+		os.Exit(0)
 	}
 
-	var cursorOption types.GeneratorCursor
-	flag.Var(&cursorOption, "cursor", "")
-	flag.Parse()
-
-	if args := flag.Args(); len(args) > 0 {
-		if len(args) == 1 {
-			fmt.Printf("unexpected argument: %s\n\n", args[0])
-		} else {
-			fmt.Printf("unexpected arguments: %v\n\n", strings.Join(args, ", "))
-		}
-		flag.CommandLine.Usage()
-		os.Exit(1)
-	}
-
-	if cursorOption == "" {
-		_ = cursorOption.Set("")
+	if flags.cursorOption == "" {
+		_ = flags.cursorOption.Set("")
 	}
 
 	feedGenAzConfig, errMap := config.NewFeedGenAzConfig()
@@ -89,7 +72,7 @@ Flags:
 
 	feedGeneratorAz := feedgenAz.NewGenerator(postCollection, feedAzCollection)
 
-	startCrons(ctx, feedGenAzConfig, feedGeneratorAz, feedAzCollection, cursorOption)
+	startCrons(ctx, feedGenAzConfig, feedGeneratorAz, feedAzCollection, flags.cursorOption)
 	logger.Log.Info("Cron jobs started")
 
 	<-ctx.Done()
@@ -138,4 +121,39 @@ func listenForTermination(do func()) {
 	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
 	<-sigChan
 	do()
+}
+
+func getFlags() *flags {
+	flags := &flags{}
+
+	flag.Usage = func() {
+		fmt.Println(
+			`Usage:
+
+feedgen-az [flags]
+
+Flags:
+    -version         version information
+    -h, -help        Display this help message
+    -cursor string   Specify the starting point for feed data generation (default: last-generated)
+        Options:
+       	    last-generated: Resume from the last generated data in storage
+       	    first-post: Start from the beginning of the posts`)
+	}
+
+	flag.BoolVar(&flags.version, "version", false, "print version information")
+	flag.Var(&flags.cursorOption, "cursor", "Specify the starting point for feed data generation")
+	flag.Parse()
+
+	if args := flag.Args(); len(args) > 0 {
+		if len(args) == 1 {
+			fmt.Printf("unexpected argument: %s\n\n", args[0])
+		} else {
+			fmt.Printf("unexpected arguments: %v\n\n", strings.Join(args, ", "))
+		}
+		flag.CommandLine.Usage()
+		os.Exit(1)
+	}
+
+	return flags
 }

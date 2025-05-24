@@ -2,6 +2,9 @@
 
 version: "3"
 
+vars:
+    DOCKER_REGISTRY: "git.aykhans.me/bsky/"
+
 tasks:
     ftl:
         cmds:
@@ -16,19 +19,19 @@ tasks:
     lint: golangci-lint run
 
     run-consumer:
-        cmd: go run cmd/consumer/main.go {{.CLI_ARGS}}
+        cmd: go run ./cmd/consumer {{.CLI_ARGS}}
         dotenv:
             - config/app/.consumer.env
             - config/app/.mongodb.env
 
     run-feedgen-az:
-        cmd: go run cmd/feedgen/az/main.go {{.CLI_ARGS}}
+        cmd: go run ./cmd/feedgen/az {{.CLI_ARGS}}
         dotenv:
             - config/app/feedgen/.az.env
             - config/app/.mongodb.env
 
     run-api:
-        cmd: go run cmd/api/main.go
+        cmd: go run ./cmd/api {{.CLI_ARGS}}
         dotenv:
             - config/app/.api.env
             - config/app/.mongodb.env
@@ -55,21 +58,55 @@ tasks:
 
     docker-publish-api:
         desc: Publish docker image for api service
+        vars:
+            GO_VERSION_FILE: ./cmd/api/version.go
+            IMAGE_NAME: feedgen-api
+            VERSION:
+                sh: grep -o 'const version = "[^"]*"' {{.GO_VERSION_FILE}} | grep -o '"[^"]*"' | tr -d '"'
+            VERSIONED_IMAGE: "{{.DOCKER_REGISTRY}}{{.IMAGE_NAME}}:{{.VERSION}}"
+            LATEST_IMAGE: "{{.DOCKER_REGISTRY}}{{.IMAGE_NAME}}:latest"
+        preconditions:
+            - test -f {{.GO_VERSION_FILE}}
+            - sh: '[ -n "{{.VERSION}}" ]'
+              msg: "Could not extract version from {{.GO_FILE}}"
         cmds:
-            - docker build -t git.aykhans.me/bsky/feedgen-api:latest -f ./cmd/api/Dockerfile .
-            - docker push git.aykhans.me/bsky/feedgen-api:latest
+            - docker build -t {{.VERSIONED_IMAGE}} -f ./cmd/api/Dockerfile .
+            - docker tag {{.VERSIONED_IMAGE}} {{.LATEST_IMAGE}}
+            - docker push {{.VERSIONED_IMAGE}}
+            - docker push {{.LATEST_IMAGE}}
+            - echo "Published {{.VERSIONED_IMAGE}} and {{.LATEST_IMAGE}}"
 
     docker-publish-consumer:
         desc: Publish docker image for consumer service
+        vars:
+            GO_VERSION_FILE: ./cmd/consumer/version.go
+            IMAGE_NAME: feedgen-consumer
+            VERSION:
+                sh: grep -o 'const version = "[^"]*"' {{.GO_VERSION_FILE}} | grep -o '"[^"]*"' | tr -d '"'
+            VERSIONED_IMAGE: "{{.DOCKER_REGISTRY}}{{.IMAGE_NAME}}:{{.VERSION}}"
+            LATEST_IMAGE: "{{.DOCKER_REGISTRY}}{{.IMAGE_NAME}}:latest"
         cmds:
-            - docker build -t git.aykhans.me/bsky/feedgen-consumer:latest -f ./cmd/consumer/Dockerfile .
-            - docker push git.aykhans.me/bsky/feedgen-consumer:latest
+            - docker build -t {{.VERSIONED_IMAGE}} -f ./cmd/consumer/Dockerfile .
+            - docker push {{.VERSIONED_IMAGE}}
+            - docker tag {{.VERSIONED_IMAGE}} {{.LATEST_IMAGE}}
+            - docker push {{.LATEST_IMAGE}}
+            - echo "Published {{.VERSIONED_IMAGE}} and {{.LATEST_IMAGE}}"
 
     docker-publish-feedgen-az:
         desc: Publish docker image for feedgen-az service
+        vars:
+            GO_VERSION_FILE: ./cmd/feedgen/az/version.go
+            IMAGE_NAME: feedgen-generator-az
+            VERSION:
+                sh: grep -o 'const version = "[^"]*"' {{.GO_VERSION_FILE}} | grep -o '"[^"]*"' | tr -d '"'
+            VERSIONED_IMAGE: "{{.DOCKER_REGISTRY}}{{.IMAGE_NAME}}:{{.VERSION}}"
+            LATEST_IMAGE: "{{.DOCKER_REGISTRY}}{{.IMAGE_NAME}}:latest"
         cmds:
-            - docker build -t git.aykhans.me/bsky/feedgen-generator-az:latest -f ./cmd/feedgen/az/Dockerfile .
-            - docker push git.aykhans.me/bsky/feedgen-generator-az:latest
+            - docker build -t {{.VERSIONED_IMAGE}} -f ./cmd/feedgen/az/Dockerfile .
+            - docker push {{.VERSIONED_IMAGE}}
+            - docker tag {{.VERSIONED_IMAGE}} {{.LATEST_IMAGE}}
+            - docker push {{.LATEST_IMAGE}}
+            - echo "Published {{.VERSIONED_IMAGE}} and {{.LATEST_IMAGE}}"
 
     docker-publish-manager:
         desc: Publish docker image for manager service
