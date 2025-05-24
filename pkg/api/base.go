@@ -34,6 +34,9 @@ func Run(
 		"GET /xrpc/app.bsky.feed.getFeedSkeleton",
 		authMiddleware.JWTAuthMiddleware(http.HandlerFunc(feedHandler.GetFeedSkeleton)),
 	)
+	mux.HandleFunc("GET /{feed}/users", feedHandler.GetAllUsers)
+	mux.HandleFunc("GET /{feed}/users/valid/", feedHandler.GetValidUsers)
+	mux.HandleFunc("GET /{feed}/users/invalid/", feedHandler.GetInvalidUsers)
 
 	httpServer := &http.Server{
 		Addr:    fmt.Sprintf(":%d", apiConfig.APIPort),

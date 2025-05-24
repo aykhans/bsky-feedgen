@@ -114,7 +114,7 @@ func (generator *Generator) IsValid(post *collections.Post) bool {
 		return false
 	}
 
-	if isValidUser := users.IsValid(post.DID); isValidUser != nil {
+	if isValidUser := Users.IsValid(post.DID); isValidUser != nil {
 		return *isValidUser
 	}
 

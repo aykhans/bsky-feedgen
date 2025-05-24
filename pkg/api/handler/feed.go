@@ -10,6 +10,7 @@ import (
 	"github.com/aykhans/bsky-feedgen/pkg/api/middleware"
 	"github.com/aykhans/bsky-feedgen/pkg/api/response"
 	"github.com/aykhans/bsky-feedgen/pkg/feed"
+	generatorAz "github.com/aykhans/bsky-feedgen/pkg/generator/az"
 	"github.com/aykhans/bsky-feedgen/pkg/types"
 	"github.com/aykhans/bsky-feedgen/pkg/utils"
 	"github.com/bluesky-social/indigo/api/bsky"
@@ -98,4 +99,47 @@ func (handler *FeedHandler) GetFeedSkeleton(w http.ResponseWriter, r *http.Reque
 		Feed:   feedItems,
 		Cursor: newCursor,
 	})
+}
+
+func (handler *FeedHandler) GetValidUsers(w http.ResponseWriter, r *http.Request) {
+	feed := r.PathValue("feed")
+
+	validUsers := make([]string, 0)
+	switch feed {
+	case "AzPulse":
+		validUsers = generatorAz.Users.GetValidUsers()
+	}
+
+	response.JSON(w, 200, response.M{
+		"feed":  feed,
+		"users": validUsers,
+	})
+}
+
+func (handler *FeedHandler) GetInvalidUsers(w http.ResponseWriter, r *http.Request) {
+	feed := r.PathValue("feed")
+
+	invalidUsers := make([]string, 0)
+	switch feed {
+	case "AzPulse":
+		invalidUsers = generatorAz.Users.GetInvalidUsers()
+	}
+
+	response.JSON(w, 200, response.M{
+		"feed":  feed,
+		"users": invalidUsers,
+	})
+}
+
+func (handler *FeedHandler) GetAllUsers(w http.ResponseWriter, r *http.Request) {
+	feed := r.PathValue("feed")
+
+	responseData := response.M{"feed": feed}
+	switch feed {
+	case "AzPulse":
+		responseData["valid_users"] = generatorAz.Users.GetValidUsers()
+		responseData["invalid_users"] = generatorAz.Users.GetInvalidUsers()
+	}
+
+	response.JSON(w, 200, responseData)
 }

@@ -2,7 +2,7 @@ package az
 
 import "github.com/aykhans/bsky-feedgen/pkg/generator"
 
-var users = generator.Users{
+var Users = generator.Users{
 	// Invalid
 	"did:plc:5zww7zorx2ajw7hqrhuix3ba": false,
 	"did:plc:c4vhz47h566t2ntgd7gtawen": false,

@@ -39,7 +39,7 @@ func (f *FeedAz) Describe(_ context.Context) bsky.FeedDescribeFeedGenerator_Feed
 
 func (f *FeedAz) GetPage(
 	ctx context.Context,
-	_ string,
+	_ string, // user did
 	limit int64,
 	cursor string,
 ) ([]*bsky.FeedDefs_SkeletonFeedPost, *string, error) {
