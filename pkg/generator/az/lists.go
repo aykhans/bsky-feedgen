@@ -27,6 +27,9 @@ var Users = generator.Users{
 	"did:plc:phtq2rhgbwipyx5ie3apw44j": true,
 	"did:plc:jfdvklrs5n5qv7f25v6swc5h": true,
 	"did:plc:u5ez5w6qslh6advti4wyddba": true,
-	"did:plc:cs2cbzojm6hmx5lfxiuft3mq": true,
 	"did:plc:x7alwnnjygt2aqcwblhazko7": true,
+	"did:plc:mgciyhgfn65z7iazxuar6o6a": true,
+	"did:plc:ay2f5go4lxq2hspiaqohegac": true,
+	"did:plc:ftoopigdpuzqt2kpeyqxsofx": true,
+	"did:plc:cs2cbzojm6hmx5lfxiuft3mq": true,
 }
