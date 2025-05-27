@@ -24,6 +24,8 @@ var Users = generator.Users{
 	"did:plc:4hm6gb7dzobynqrpypif3dck": false,
 	"did:plc:odvarii7w7soygxet3xvzop7": false,
 	"did:plc:5cbkdchsxjvz5fog2oo7m4le": false,
+	"did:plc:ooeuisen5rtr4rojmz7gkbrh": false,
+	"did:plc:6bvhdvgeqkj7nol2zodtqmww": false,
 
 	// Valid
 	"did:plc:jbt4qi6psd7rutwzedtecsq7": true,
