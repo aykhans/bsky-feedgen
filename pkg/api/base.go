@@ -23,6 +23,7 @@ func Run(
 		return err
 	}
 	feedHandler := handler.NewFeedHandler(feeds, apiConfig.FeedgenPublisherDID)
+	generatorHandler := handler.NewGeneratorHandler()
 
 	authMiddleware := middleware.NewAuth(apiConfig.ServiceDID)
 
@@ -34,9 +35,9 @@ func Run(
 		"GET /xrpc/app.bsky.feed.getFeedSkeleton",
 		authMiddleware.JWTAuthMiddleware(http.HandlerFunc(feedHandler.GetFeedSkeleton)),
 	)
-	mux.HandleFunc("GET /{feed}/users", feedHandler.GetAllUsers)
-	mux.HandleFunc("GET /{feed}/users/valid/", feedHandler.GetValidUsers)
-	mux.HandleFunc("GET /{feed}/users/invalid/", feedHandler.GetInvalidUsers)
+	mux.HandleFunc("GET /{feed}/users", generatorHandler.GetAllUsers)
+	mux.HandleFunc("GET /{feed}/users/valid/", generatorHandler.GetValidUsers)
+	mux.HandleFunc("GET /{feed}/users/invalid/", generatorHandler.GetInvalidUsers)
 
 	httpServer := &http.Server{
 		Addr:    fmt.Sprintf(":%d", apiConfig.APIPort),
