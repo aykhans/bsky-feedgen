@@ -21,32 +21,23 @@ tasks:
     run-consumer:
         cmd: go run ./cmd/consumer {{.CLI_ARGS}}
         dotenv:
-            - config/app/.consumer.env
-            - config/app/.mongodb.env
+            - config/app/consumer.env
+            - config/app/mongodb.env
 
     run-feedgen-az:
         cmd: go run ./cmd/feedgen/az {{.CLI_ARGS}}
         dotenv:
-            - config/app/feedgen/.az.env
-            - config/app/.mongodb.env
+            - config/app/feedgen/az.env
+            - config/app/mongodb.env
 
     run-api:
         cmd: go run ./cmd/api {{.CLI_ARGS}}
         dotenv:
-            - config/app/.api.env
-            - config/app/.mongodb.env
+            - config/app/api.env
+            - config/app/mongodb.env
 
     run-manager:
         cmd: go run cmd/manager/main.go {{.CLI_ARGS}}
-
-    generate-env:
-        desc: Generate env files from templates
-        cmds:
-            - cp config/app/consumer.env.example config/app/.consumer.env
-            - cp config/app/api.env.example config/app/.api.env
-            - cp config/app/mongodb.env.example config/app/.mongodb.env
-            - cp config/app/feedgen/az.env.example config/app/feedgen/.az.env
-            - cp config/mongodb/env.example config/mongodb/.env
 
     docker-publish-all:
         desc: Publish docker images for all services

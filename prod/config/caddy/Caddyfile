@@ -1,0 +1,11 @@
+{
+    admin off
+}
+
+{$DOMAIN} {
+    request_body {
+        max_size 8MB
+    }
+
+    reverse_proxy {$API_HOST}
+}
