@@ -67,3 +67,23 @@ func (u Users) GetAll() []string {
 
 	return allUsers
 }
+
+type Langs map[string]bool
+
+// IsExistsAny checks if any of the given language codes exist in the Langs map.
+//
+// Parameters:
+//   - langs: A slice of language code strings to check for existence
+//
+// Returns:
+//   - bool: true if at least one language code from the input slice exists in the map,
+//           false if none of the provided language codes exist
+func (l Langs) IsExistsAny(langs []string) bool {
+	for _, lang := range langs {
+		if _, ok := l[lang]; ok {
+			return true
+		}
+	}
+
+	return false
+}

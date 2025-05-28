@@ -42,3 +42,10 @@ var Users = generator.Users{
 	"did:plc:ftoopigdpuzqt2kpeyqxsofx": true,
 	"did:plc:cs2cbzojm6hmx5lfxiuft3mq": true,
 }
+
+var Langs = generator.Langs{
+	"az": true,
+	"en": true,
+	"tr": true,
+	"ru": true,
+}

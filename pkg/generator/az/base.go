@@ -110,16 +110,24 @@ func (generator *Generator) Start(ctx context.Context, cursorOption types.Genera
 }
 
 func (generator *Generator) IsValid(post *collections.Post) bool {
+	// Skip posts that are deep replies (not direct replies to original posts)
 	if post.Reply != nil && post.Reply.RootURI != post.Reply.ParentURI {
 		return false
 	}
 
+	// Check if the user who created this post is in our pre-defined list
+	// This allows for explicit inclusion/exclusion of specific users
 	if isValidUser := Users.IsValid(post.DID); isValidUser != nil {
 		return *isValidUser
 	}
 
-	if (slices.Contains(post.Langs, "az") && len(post.Langs) < 3) || // Posts in Azerbaijani language with fewer than 3 languages
-		generator.textRegex.MatchString(post.Text) { // Posts containing Azerbaijan-related keywords
+	// A post is considered valid if it meets either of the following criteria:
+	// 1. It's primarily in Azerbaijani (language code "az") with less than 3 detected languages
+	//    (to filter out multi-language spam)
+	// 2. It contains Azerbaijan-related keywords in the text AND has at least one valid language
+	//    from our approved language list
+	if (slices.Contains(post.Langs, "az") && len(post.Langs) < 3) ||
+		(generator.textRegex.MatchString(post.Text) && Langs.IsExistsAny(post.Langs)) {
 		return true
 	}
 
