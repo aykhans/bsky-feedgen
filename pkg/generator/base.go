@@ -77,7 +77,7 @@ type Langs map[string]bool
 //
 // Returns:
 //   - bool: true if at least one language code from the input slice exists in the map,
-//           false if none of the provided language codes exist
+//     false if none of the provided language codes exist
 func (l Langs) IsExistsAny(langs []string) bool {
 	for _, lang := range langs {
 		if _, ok := l[lang]; ok {
