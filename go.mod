@@ -85,8 +85,8 @@ require (
 	github.com/prometheus/procfs v0.12.0 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
 	github.com/spaolacci/murmur3 v1.1.0 // indirect
-	github.com/spf13/cobra v1.9.1
-	github.com/spf13/pflag v1.0.6 // indirect
+	github.com/spf13/cobra v1.10.1
+	github.com/spf13/pflag v1.0.9 // indirect
 	github.com/whyrusleeping/cbor-gen v0.2.1-0.20241030202151-b7a6831be65e // indirect
 	github.com/whyrusleeping/go-did v0.0.0-20240828165449-bcaa7ae21371
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
