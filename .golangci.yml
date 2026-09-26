@@ -11,7 +11,7 @@ linters:
         - asasalint
         - asciicheck
         - errcheck
-        - gomodguard
+        - gomodguard_v2
         - goprintffuncname
         - govet
         - ineffassign
